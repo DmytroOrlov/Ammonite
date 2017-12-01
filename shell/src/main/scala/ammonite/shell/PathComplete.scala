@@ -170,9 +170,15 @@ object PathComplete {
         def wrap(s: String) =
           if(fragPrefix.startsWith("\"")) Parsers.stringWrap(s)
           else Parsers.stringSymWrap(s)
+
+        val startsWithFragPrefix = (s: String) => {
+          if (fragPrefix == fragPrefix.toLowerCase) s.drop(1).toLowerCase
+          else s.drop(1)
+        }.startsWith(fragPrefix.drop(1))
+
         val options = (
           ls ! path | (x => (x, wrap(x.last)))
-                    |? (_._2.startsWith(fragPrefix))
+                    |? (s => startsWithFragPrefix(s._2))
           )
         val (completions, details) = options.partition(_._2 != fragPrefix)
 
@@ -194,8 +200,9 @@ object PathComplete {
           Printing(TermState(rest, b, c), stdout)
         else {
           val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
-          val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
-          Printing(TermState(rest, newBuffer, c - cursorOffset + common.length + 1), stdout)
+          val com = if (common.length > fragPrefix.length) common else fragPrefix
+          val newBuffer = b.take(c - cursorOffset) ++ com ++ b.drop(c)
+          Printing(TermState(rest, newBuffer, c - cursorOffset + com.length + 1), stdout)
         }
       }
   }
