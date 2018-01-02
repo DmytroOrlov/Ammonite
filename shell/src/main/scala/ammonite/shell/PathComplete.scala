@@ -199,10 +199,10 @@ object PathComplete {
         if (details.length != 0 || completions.length == 0)
           Printing(TermState(rest, b, c), stdout)
         else {
-          val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
-          val com = if (common.length > fragPrefix.length) common else fragPrefix
-          val newBuffer = b.take(c - cursorOffset) ++ com ++ b.drop(c)
-          Printing(TermState(rest, newBuffer, c - cursorOffset + com.length + 1), stdout)
+          val csCommon = FrontEndUtils.findPrefix(completions.map(_._2), 0)
+          val csCommonButPrefix = if (csCommon.length > fragPrefix.length) csCommon else fragPrefix
+          val newBuffer = b.take(c - cursorOffset) ++ csCommonButPrefix ++ b.drop(c)
+          Printing(TermState(rest, newBuffer, c - cursorOffset + csCommonButPrefix.length + 1), stdout)
         }
       }
   }
